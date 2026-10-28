@@ -6,12 +6,12 @@
 // ───────── 成長階段 ─────────
 // 門檻依「每天約 43 成長值」（答題約 20＋摸摸頭 6＋照顧約 17）估算，約 70 天養成，比期末考（1/10）早幾天
 const PET_STAGES = [
-  { at: 0, name: '新生小奶狗', emoji: '🐶', desc: '眼睛還沒張開，縮成一團' },
-  { at: 260, name: '搖搖幼犬', emoji: '🐶', desc: '大頭短腿，走路搖搖晃晃' },
-  { at: 700, name: '活潑小臘腸', emoji: '🐕', desc: '長出軟軟的長毛' },
-  { at: 1300, name: '少年臘腸', emoji: '🐕', desc: '身體變長，耳朵毛飄逸' },
-  { at: 2100, name: '帥氣大臘腸', emoji: '🐕', desc: '一身閃亮長毛，四個眼睛超有神' },
-  { at: 3000, name: '傳說神犬', emoji: '🌟', desc: '長出天使翅膀和光環！' },
+  { at: 0, name: '新生小奶狗', emoji: '🐶', desc: '縮在小被子上呼呼大睡' },
+  { at: 260, name: '搖搖幼犬', emoji: '🐶', desc: '大頭圓眼睛、短短的腿' },
+  { at: 700, name: '活潑小臘腸', emoji: '🐕', desc: '吐舌頭到處跑，開始長長毛' },
+  { at: 1300, name: '少年臘腸', emoji: '🐕', desc: '身體拉長，耳朵和尾巴毛變長' },
+  { at: 2100, name: '帥氣大臘腸', emoji: '🐕', desc: '抬頭挺胸，一身閃亮飄逸長毛' },
+  { at: 3000, name: '傳說神犬', emoji: '🌟', desc: '長出翅膀和光環，飛起來了！' },
 ];
 const PET_GOAL = { date: '2027-01-10', label: '期末考前' }; // 養成目標日（顯示用）
 // 每週（週一～週日）最多成長多少：330 × 9 週 ＝ 2970 ＜ 3000，最快也要 12/28 那週才養成（約期末考前兩週）
@@ -173,15 +173,17 @@ function petMood(p) {
 const petNeedsCare = () => { petTick(); const p = S.pet; return p.food < 30 || p.happy < 30 || p.clean < 30; };
 
 // ───────── 畫狗狗（自己畫的 SVG：黑四目長毛臘腸，臉朝左；衣服會依身體形狀「穿」上去）─────────
-// 每個階段的身體幾何（座標 0～100，腳踩在 y≈95）
-// body 身體橢圓、head 頭、leg 腿長、ear 耳朵長度、hair 長毛長度、tail 尾巴長度、size 在場景中的大小
+// 每個階段的身體幾何（座標 0～100，腳踩在 y≈95）；六個階段在體型、姿勢、毛量上刻意拉開差距
+// body 身體橢圓、head 頭、size 在場景中的大小
+// pose：lie 趴睡／sit 短腿站著／run 奔跑／stand 站好／proud 抬頭挺胸／fly 飛起來
+// eye 眼睛大小、snout 嘴巴長度、ear 耳朵長度、fringe 耳朵長毛、hair 肚子長毛、legHair 腳上長毛、ruff 胸前毛領、tail 尾巴長度、plume 尾巴長毛
 const PET_BODY = [
-  { size: 0.56, body: { cx: 57, cy: 81, rx: 22, ry: 10 }, head: { cx: 32, cy: 76, r: 12 }, lying: 1, sleep: 1, ear: 0.9, hair: 1.5, tail: 9 },
-  { size: 0.62, body: { cx: 57, cy: 72, rx: 22, ry: 12 }, head: { cx: 31, cy: 56, r: 15 }, ear: 1.0, hair: 2, tail: 11 },
-  { size: 0.70, body: { cx: 56, cy: 72, rx: 25, ry: 12 }, head: { cx: 28, cy: 55, r: 13.5 }, ear: 1.2, hair: 3, tail: 14 },
-  { size: 0.76, body: { cx: 56, cy: 72, rx: 28, ry: 12 }, head: { cx: 25, cy: 53, r: 12.5 }, ear: 1.4, hair: 4, tail: 17 },
-  { size: 0.82, body: { cx: 56, cy: 71, rx: 31, ry: 13 }, head: { cx: 22, cy: 51, r: 12.5 }, ear: 1.6, hair: 5, tail: 20 },
-  { size: 0.86, body: { cx: 56, cy: 71, rx: 31, ry: 13 }, head: { cx: 22, cy: 51, r: 12.5 }, ear: 1.7, hair: 5.5, tail: 21, wings: 1, halo: 1 },
+  { size: 0.48, body: { cx: 56, cy: 82, rx: 19, ry: 10 }, head: { cx: 35, cy: 77, r: 13 }, pose: 'lie', sleep: 1, eye: 1, snout: 0.5, ear: 0.75, fringe: 0, hair: 0, legHair: 0, ruff: 0, tail: 7, plume: 0, blanket: 1 },
+  { size: 0.58, body: { cx: 57, cy: 74, rx: 17, ry: 13 }, head: { cx: 36, cy: 55, r: 17 }, pose: 'sit', eye: 1.45, snout: 0.6, ear: 0.85, fringe: 0, hair: 0, legHair: 0, ruff: 0, tail: 9, plume: 0, blush: 1 },
+  { size: 0.66, body: { cx: 56, cy: 70, rx: 24, ry: 11 }, head: { cx: 29, cy: 52, r: 13.5 }, pose: 'run', eye: 1.15, snout: 0.85, ear: 1.15, fringe: 1, hair: 2, legHair: 0, ruff: 0, tail: 14, plume: 1, tongue: 1 },
+  { size: 0.72, body: { cx: 56, cy: 72, rx: 29, ry: 12 }, head: { cx: 24, cy: 53, r: 12.5 }, pose: 'stand', eye: 1, snout: 1, ear: 1.45, fringe: 2, hair: 4, legHair: 1, ruff: 1, tail: 18, plume: 2 },
+  { size: 0.8, body: { cx: 57, cy: 70, rx: 33, ry: 13 }, head: { cx: 22, cy: 44, r: 12.5 }, pose: 'proud', eye: 1, snout: 1.08, ear: 1.85, fringe: 3, hair: 6.5, legHair: 2, ruff: 2, tail: 22, plume: 3, shine: 1 },
+  { size: 0.82, body: { cx: 57, cy: 64, rx: 33, ry: 13 }, head: { cx: 22, cy: 39, r: 12.5 }, pose: 'fly', eye: 1, snout: 1.08, ear: 1.9, fringe: 3, hair: 7, legHair: 2, ruff: 2, tail: 24, plume: 3, shine: 1, wings: 1, halo: 1, aura: 1 },
 ];
 // 毛色：[主色, 棕色斑（四目、嘴、胸、腳）, 深色（遠側的腳）, 毛流線條]
 const PET_COLORS = {
@@ -266,46 +268,70 @@ function petSvg(stage, colorId, outfitId, gearId, hatId) {
   const anim = colorId === 'c-rainbow' ? '<animate attributeName="fill" values="#ff6b6b;#ffb347;#ffe066;#6bd68a;#5ab0ff;#b48cff;#ff6b6b" dur="5s" repeatCount="indefinite"/>' : '';
   const C = (tag, attrs) => `<${tag} ${attrs} fill="${coat}">${anim}</${tag}>`; // 主毛色（彩虹會變色）
   const o = outfitId ? petOutfit(outfitId, b, h, u) : {};
-  const k = h.r / 12.5; // 頭的比例
+  const k = h.r / 12.5;
   let s = `<svg viewBox="0 0 100 100" class="pet-svg" style="overflow:visible"${colorId === 'c-ghost' ? ' opacity=".78"' : ''}><defs>` +
     `<linearGradient id="pg${u}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3b0"/><stop offset=".5" stop-color="#f2c230"/><stop offset="1" stop-color="#c99512"/></linearGradient>` +
+    `<radialGradient id="pr${u}"><stop offset="0" stop-color="#fff6c2" stop-opacity=".95"/><stop offset=".6" stop-color="#ffd54a" stop-opacity=".45"/><stop offset="1" stop-color="#ffd54a" stop-opacity="0"/></radialGradient>` +
     `<clipPath id="pc${u}"><ellipse cx="${b.cx}" cy="${b.cy}" rx="${b.rx}" ry="${b.ry}"/></clipPath>${o.defs || ''}</defs>`;
 
-  // 傳說神犬：翅膀
-  if (B.wings) for (const [dx, op] of [[6, 0.75], [0, 1]]) {
-    const wx = b.cx - 4 + dx, wy = b.cy - b.ry + 2;
-    s += `<g opacity="${op}"><path d="M${wx} ${wy} C${wx + 4} ${wy - 22} ${wx + 26} ${wy - 30} ${wx + 34} ${wy - 26} C${wx + 28} ${wy - 22} ${wx + 30} ${wy - 16} ${wx + 24} ${wy - 13} C${wx + 28} ${wy - 9} ${wx + 22} ${wy - 5} ${wx + 16} ${wy - 5} C${wx + 16} ${wy - 1} ${wx + 8} ${wy + 1} ${wx} ${wy} Z" fill="#fffdf4" stroke="#e8d9a8" stroke-width=".8"/>` +
-      `<path d="M${wx + 6} ${wy - 6} Q${wx + 16} ${wy - 16} ${wx + 28} ${wy - 22} M${wx + 5} ${wy - 3} Q${wx + 14} ${wy - 8} ${wx + 20} ${wy - 10}" stroke="#eadfb8" stroke-width=".8" fill="none"/></g>`;
+  // 傳說神犬：金色光芒、地上的影子、翅膀
+  if (B.aura) {
+    s += `<circle cx="${b.cx - 8}" cy="${b.cy - 12}" r="50" fill="url(#pr${u})"/>`;
+    for (let i = 0; i < 12; i++) s += `<path d="M${b.cx - 8} ${b.cy - 12} L${b.cx - 8 + 52 * Math.cos(i * Math.PI / 6)} ${b.cy - 12 + 52 * Math.sin(i * Math.PI / 6)}" stroke="#ffe27a" stroke-width="1.6" opacity=".35"/>`;
+  }
+  if (B.pose === 'fly') s += `<ellipse cx="${b.cx - 4}" cy="95" rx="${b.rx * 0.9}" ry="2.6" fill="#000" opacity=".15"/>`;
+  if (B.blanket) s += `<ellipse cx="${b.cx - 6}" cy="91" rx="36" ry="7" fill="#9fd3f5"/><ellipse cx="${b.cx - 6}" cy="90" rx="33" ry="5.4" fill="#c8e8ff"/>` +
+    [-24, -12, 0, 12, 24].map(dx => `<circle cx="${b.cx - 6 + dx}" cy="90.5" r="1.3" fill="#fff"/>`).join('');
+  if (B.wings) for (const [dx, op, sc] of [[8, 0.7, 0.9], [0, 1, 1.1]]) {
+    const wx = b.cx - 6 + dx, wy = b.cy - b.ry + 3;
+    s += `<g opacity="${op}" transform="translate(${wx} ${wy}) scale(${sc}) translate(${-wx} ${-wy})"><path d="M${wx} ${wy} C${wx + 4} ${wy - 24} ${wx + 28} ${wy - 34} ${wx + 38} ${wy - 30} C${wx + 31} ${wy - 25} ${wx + 33} ${wy - 18} ${wx + 26} ${wy - 15} C${wx + 31} ${wy - 10} ${wx + 24} ${wy - 6} ${wx + 18} ${wy - 6} C${wx + 18} ${wy - 1} ${wx + 9} ${wy + 1} ${wx} ${wy} Z" fill="#fffdf4" stroke="#e8d9a8" stroke-width=".8"/>` +
+      `<path d="M${wx + 6} ${wy - 6} Q${wx + 17} ${wy - 18} ${wx + 31} ${wy - 25} M${wx + 5} ${wy - 3} Q${wx + 15} ${wy - 9} ${wx + 22} ${wy - 12}" stroke="#eadfb8" stroke-width=".8" fill="none"/></g>`;
   }
   if (o.back) s += o.back;
 
-  // 尾巴：從屁股往上翹，下面垂著長毛
+  // 尾巴：小奶狗是短短一截；越大越長、毛越多
   {
     const tx = b.cx + b.rx * 0.9, ty = b.cy - b.ry * 0.35, L = B.tail;
-    const ex = tx + L * 0.75, ey = ty - L * (B.lying ? 0.2 : 0.75);
+    const up = B.pose === 'lie' ? 0.15 : B.pose === 'run' ? 1.0 : B.pose === 'fly' ? 0.3 : 0.75;
+    const ex = tx + L * 0.75, ey = ty - L * up;
     s += `<path d="M${tx} ${ty} Q${tx + L * 0.55} ${ty - L * 0.05} ${ex} ${ey}" stroke="${coat0}" stroke-width="${3.4 * (0.7 + k * 0.3)}" fill="none" stroke-linecap="round">${anim ? anim.replace('attributeName="fill"', 'attributeName="stroke"') : ''}</path>`;
-    for (let i = 1; i <= 3; i++) {
-      const t = i / 4, px = tx + (ex - tx) * t + 1, py = ty + (ey - ty) * t * t + 1.5;
-      s += C('ellipse', `cx="${px}" cy="${py + B.hair * 0.5}" rx="${1.6 + B.hair * 0.25}" ry="${2 + B.hair * 0.6}" transform="rotate(${-25 + i * 6} ${px} ${py})"`);
+    const n = B.plume ? 2 + B.plume * 2 : 0;
+    for (let i = 1; i <= n; i++) {
+      const t = i / (n + 1), px = tx + (ex - tx) * t + 1, py = ty + (ey - ty) * t * t + 1.5;
+      s += C('ellipse', `cx="${px + 1}" cy="${py + B.plume * 1.4}" rx="${1.2 + B.plume * 0.35}" ry="${1.8 + B.plume * 1.5}" transform="rotate(${-30 + i * 5} ${px} ${py})"`);
     }
   }
 
-  // 腳：遠側兩隻（深色）、近側兩隻；下半截是棕色
-  const legs = (xs, fill, off) => xs.map(x => {
-    if (B.lying) return `<ellipse cx="${x - 3}" cy="${b.cy + b.ry * 0.85}" rx="4.6" ry="2.4" fill="${tan}"/>`;
-    const y0 = b.cy + b.ry * 0.3, y1 = 94 - off;
-    return `<rect x="${x - 2.9}" y="${y0}" width="5.8" height="${y1 - y0}" rx="2.6" fill="${fill}"/><rect x="${x - 2.9}" y="${y1 - (y1 - y0) * 0.45}" width="5.8" height="${(y1 - y0) * 0.45}" rx="2.4" fill="${tan}"/><ellipse cx="${x - 1.4}" cy="${y1 - 0.8}" rx="4" ry="2" fill="${tan}"/>`;
-  }).join('');
+  // 腳：每種姿勢不同；下半截是棕色；長大後腳上有飄逸的長毛
   const fx = b.cx - b.rx * 0.62, bx = b.cx + b.rx * 0.6;
-  if (!B.lying) s += legs([fx + 4, bx + 4], dark, 1.5);
+  const leg = (x, ang, fill, w, len, hairy) => {
+    const y0 = b.cy + b.ry * 0.3;
+    let g = `<g transform="rotate(${ang} ${x} ${y0})">`;
+    if (hairy) g += [0.35, 0.6].map(t => C('ellipse', `cx="${x + w * 0.55}" cy="${y0 + len * t}" rx="${1 + hairy * 0.6}" ry="${2 + hairy * 1.4}" transform="rotate(-18 ${x} ${y0 + len * t})"`)).join('');
+    g += `<rect x="${x - w / 2}" y="${y0}" width="${w}" height="${len}" rx="${w * 0.45}" fill="${fill}"/><rect x="${x - w / 2}" y="${y0 + len * 0.55}" width="${w}" height="${len * 0.45}" rx="${w * 0.42}" fill="${tan}"/><ellipse cx="${x - w * 0.22}" cy="${y0 + len - 0.8}" rx="${w * 0.7}" ry="${w * 0.36}" fill="${tan}"/>`;
+    return g + '</g>';
+  };
+  const legSet = (near) => {
+    const fill = near ? coat0 : dark, off = near ? 0 : 3.5;
+    const len = 94 - (b.cy + b.ry * 0.3) - (near ? 0 : 1.5);
+    const hairy = near ? B.legHair : 0;
+    switch (B.pose) {
+      case 'lie': return near ? `<ellipse cx="${h.cx - 2}" cy="${b.cy + b.ry * 0.85}" rx="5" ry="2.6" fill="${tan}"/><ellipse cx="${h.cx + 8}" cy="${b.cy + b.ry * 0.9}" rx="5" ry="2.6" fill="${tan}"/><ellipse cx="${bx + 4}" cy="${b.cy + b.ry * 0.85}" rx="5.5" ry="2.8" fill="${tan}"/>` : '';
+      case 'sit': return leg(fx + off, 0, fill, 7.2, len, 0) + leg(bx + off, 0, fill, 7.2, len, 0);
+      case 'run': return leg(fx + off, near ? 32 : 18, fill, 5.6, len, hairy) + leg(bx + off, near ? -34 : -20, fill, 5.6, len, hairy);
+      case 'fly': return leg(fx + off, 62, fill, 5.6, len * 0.85, hairy) + leg(bx + off, -64, fill, 5.6, len * 0.85, hairy);
+      default: return leg(fx + off, 0, fill, 5.8, len, hairy) + leg(bx + off, 0, fill, 5.8, len, hairy);
+    }
+  };
+  s += legSet(false);
 
-  // 肚子下面的長毛
+  // 肚子下面的長毛（越大越長）
   if (B.hair) {
     let p = `M${b.cx - b.rx * 0.8} ${b.cy + b.ry * 0.3}`;
-    const n = 7;
+    const n = 9;
     for (let i = 0; i <= n; i++) {
       const x = b.cx - b.rx * 0.8 + (b.rx * 1.5) * i / n;
-      const y = b.cy + b.ry * Math.sqrt(Math.max(0, 1 - ((x - b.cx) / b.rx) ** 2)) + B.hair * (i % 2 ? 1 : 0.55);
+      const y = b.cy + b.ry * Math.sqrt(Math.max(0, 1 - ((x - b.cx) / b.rx) ** 2)) + B.hair * (i % 2 ? 1 : 0.45);
       p += ` L${x} ${y}`;
     }
     p += ` L${b.cx + b.rx * 0.7} ${b.cy} Z`;
@@ -320,43 +346,56 @@ function petSvg(stage, colorId, outfitId, gearId, hatId) {
   }
   // 身體
   s += C('ellipse', `cx="${b.cx}" cy="${b.cy}" rx="${b.rx}" ry="${b.ry}"`);
-  // 胸前的棕色
   s += `<g clip-path="url(#pc${u})"><ellipse cx="${b.cx - b.rx * 0.92}" cy="${b.cy + b.ry * 0.35}" rx="${b.rx * 0.22}" ry="${b.ry * 0.62}" fill="${tan}"/></g>`;
-  // 毛流
-  s += `<path d="M${b.cx - b.rx * 0.3} ${b.cy - b.ry * 0.45} q4 2 8 0 M${b.cx + b.rx * 0.15} ${b.cy - b.ry * 0.25} q4 2 8 0 M${b.cx - b.rx * 0.05} ${b.cy + b.ry * 0.2} q4 2 8 0" stroke="${line}" stroke-width=".9" fill="none" stroke-linecap="round" opacity=".8"/>`;
-  // 近側的腳
-  s += B.lying ? legs([h.cx + 2, h.cx + 10], tan, 0) : legs([fx, bx], coat0, 0);
-
-  // 衣服
+  // 毛流、光澤
+  if (B.hair) s += `<path d="M${b.cx - b.rx * 0.3} ${b.cy - b.ry * 0.45} q4 2 8 0 M${b.cx + b.rx * 0.15} ${b.cy - b.ry * 0.25} q4 2 8 0 M${b.cx - b.rx * 0.05} ${b.cy + b.ry * 0.2} q4 2 8 0" stroke="${line}" stroke-width=".9" fill="none" stroke-linecap="round" opacity=".8"/>`;
+  if (B.shine) s += `<path d="M${b.cx - b.rx * 0.45} ${b.cy - b.ry * 0.5} Q${b.cx} ${b.cy - b.ry * 0.78} ${b.cx + b.rx * 0.4} ${b.cy - b.ry * 0.52}" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".28"/>`;
+  s += legSet(true);
   if (o.on) s += `<g clip-path="url(#pc${u})">${o.on}</g>`;
+  // 胸前毛領
+  if (B.ruff) {
+    const n = 2 + B.ruff * 2, x0 = b.cx - b.rx * 0.95, y0 = b.cy - b.ry * 0.5;
+    for (let i = 0; i < n; i++) s += C('ellipse', `cx="${x0 - 1 + i * 0.6}" cy="${y0 + i * (b.ry * 1.1 / n)}" rx="${1.6 + B.ruff * 0.5}" ry="${2.4 + B.ruff * 0.9}" transform="rotate(25 ${x0} ${y0 + i * 3})"`);
+  }
 
-  // 頭：頭殼＋長嘴
-  const sx = h.cx - h.r * 0.95, sy = h.cy + h.r * 0.32;
+  // 頭：頭殼＋嘴（小奶狗嘴短、眼睛大）
+  const sn = B.snout;
+  const sx = h.cx - h.r * (0.6 + 0.35 * sn), sy = h.cy + h.r * 0.32;
   s += C('circle', `cx="${h.cx}" cy="${h.cy}" r="${h.r}"`);
-  s += C('ellipse', `cx="${sx}" cy="${sy}" rx="${h.r * 0.74}" ry="${h.r * 0.4}"`);
-  s += `<ellipse cx="${sx + h.r * 0.02}" cy="${sy + h.r * 0.12}" rx="${h.r * 0.68}" ry="${h.r * 0.28}" fill="${tan}"/>`;
-  s += `<ellipse cx="${h.cx - h.r * 0.22}" cy="${h.cy + h.r * 0.45}" rx="${h.r * 0.26}" ry="${h.r * 0.16}" fill="${tan}"/>`; // 臉頰
-  s += `<ellipse cx="${sx - h.r * 0.66}" cy="${sy - h.r * 0.08}" rx="${h.r * 0.17}" ry="${h.r * 0.14}" fill="#111"/><circle cx="${sx - h.r * 0.7}" cy="${sy - h.r * 0.14}" r="${h.r * 0.05}" fill="#fff" opacity=".7"/>`; // 鼻子
-  s += `<path d="M${sx - h.r * 0.5} ${sy + h.r * 0.3} q${h.r * 0.35} ${h.r * 0.16} ${h.r * 0.75} ${-h.r * 0.02}" stroke="#5a3a20" stroke-width=".8" fill="none" stroke-linecap="round"/>`; // 嘴
+  s += C('ellipse', `cx="${sx}" cy="${sy}" rx="${h.r * 0.74 * sn}" ry="${h.r * 0.4}"`);
+  s += `<ellipse cx="${sx + h.r * 0.02}" cy="${sy + h.r * 0.12}" rx="${h.r * 0.68 * sn}" ry="${h.r * 0.28}" fill="${tan}"/>`;
+  s += `<ellipse cx="${h.cx - h.r * 0.22}" cy="${h.cy + h.r * 0.45}" rx="${h.r * 0.26}" ry="${h.r * 0.16}" fill="${tan}"/>`;
+  const nx2 = sx - h.r * 0.66 * sn;
+  s += `<ellipse cx="${nx2}" cy="${sy - h.r * 0.08}" rx="${h.r * 0.17}" ry="${h.r * 0.14}" fill="#111"/><circle cx="${nx2 - h.r * 0.04}" cy="${sy - h.r * 0.14}" r="${h.r * 0.05}" fill="#fff" opacity=".7"/>`;
+  s += `<path d="M${nx2 + h.r * 0.15} ${sy + h.r * 0.3} q${h.r * 0.35 * sn} ${h.r * 0.16} ${h.r * 0.75 * sn} ${-h.r * 0.02}" stroke="#5a3a20" stroke-width=".8" fill="none" stroke-linecap="round"/>`;
+  if (B.tongue) s += `<path d="M${nx2 + h.r * 0.35} ${sy + h.r * 0.32} q${h.r * 0.02} ${h.r * 0.5} ${h.r * 0.22} ${h.r * 0.5} q${h.r * 0.2} 0 ${h.r * 0.16} ${-h.r * 0.48} z" fill="#ff7b9c" stroke="#e0567a" stroke-width=".5"/>`;
+  if (B.blush) s += `<ellipse cx="${h.cx - h.r * 0.12}" cy="${h.cy + h.r * 0.28}" rx="${h.r * 0.2}" ry="${h.r * 0.12}" fill="#ff8fab" opacity=".55"/>`;
   // 眼睛＋上面的棕色「第二對眼睛」（四目）
+  const er = h.r * 0.17 * B.eye;
   const ex = h.cx - h.r * 0.4, ey = h.cy - h.r * 0.06;
-  if (B.sleep) s += `<path d="M${ex - h.r * 0.17} ${ey} q${h.r * 0.17} ${h.r * 0.14} ${h.r * 0.34} 0" stroke="#d9b48a" stroke-width="1" fill="none" stroke-linecap="round"/>`;
-  else s += `<circle cx="${ex}" cy="${ey}" r="${h.r * 0.17}" fill="#140b07" stroke="#6b4a32" stroke-width=".5"/><circle cx="${ex - h.r * 0.05}" cy="${ey - h.r * 0.06}" r="${h.r * 0.065}" fill="#fff"/>`;
-  s += `<ellipse cx="${ex + h.r * 0.06}" cy="${ey - h.r * 0.34}" rx="${h.r * 0.13}" ry="${h.r * 0.09}" fill="${tan}"/>`;
-  // 長毛垂耳
+  if (B.sleep) s += `<path d="M${ex - h.r * 0.2} ${ey} q${h.r * 0.2} ${h.r * 0.16} ${h.r * 0.4} 0" stroke="#d9b48a" stroke-width="1.1" fill="none" stroke-linecap="round"/><text x="${h.cx + 2}" y="${h.cy - h.r - 2}" font-size="${h.r * 0.8}" fill="#7d9bd6" font-weight="700">z</text><text x="${h.cx + 9}" y="${h.cy - h.r - 9}" font-size="${h.r * 0.6}" fill="#7d9bd6" font-weight="700">z</text>`;
+  else s += `<circle cx="${ex}" cy="${ey}" r="${er}" fill="#140b07" stroke="#6b4a32" stroke-width=".5"/><circle cx="${ex - er * 0.3}" cy="${ey - er * 0.35}" r="${er * 0.38}" fill="#fff"/>` +
+    (B.eye > 1.2 ? `<circle cx="${ex + er * 0.35}" cy="${ey + er * 0.35}" r="${er * 0.18}" fill="#fff" opacity=".8"/>` : '');
+  s += `<ellipse cx="${ex + h.r * 0.06}" cy="${ey - er - h.r * 0.17}" rx="${h.r * 0.13}" ry="${h.r * 0.09}" fill="${tan}"/>`;
+  // 垂耳：小時候短短圓圓，長大後變成飄逸的長毛耳朵
   {
     const ax = h.cx + h.r * 0.05, ay = h.cy - h.r * 0.72, E = h.r * B.ear;
     const bx2 = h.cx + h.r * 0.7, by = h.cy + E * 0.85;
     let ear = `M${ax} ${ay} C${ax + h.r * 0.75} ${ay - h.r * 0.15} ${bx2 + h.r * 0.25} ${h.cy} ${bx2 + h.r * 0.1} ${by}`;
-    const w = h.r * 0.95, n = 4;
-    for (let i = 1; i <= n; i++) ear += ` Q${bx2 + h.r * 0.1 - w * (i - 0.5) / n} ${by + 2.2 * k + (i % 2) * 1.2} ${bx2 + h.r * 0.1 - w * i / n} ${by - (i === n ? 1.5 : 0)}`;
+    const w = h.r * 0.95;
+    if (B.fringe) {
+      const n = 3 + B.fringe;
+      for (let i = 1; i <= n; i++) ear += ` Q${bx2 + h.r * 0.1 - w * (i - 0.5) / n} ${by + (1.2 + B.fringe * 1.1) * k + (i % 2) * B.fringe * 0.8} ${bx2 + h.r * 0.1 - w * i / n} ${by - (i === n ? 1.5 : 0)}`;
+    } else ear += ` Q${bx2 - w * 0.45} ${by + 4 * k} ${bx2 + h.r * 0.1 - w} ${by - 1.5}`;
     ear += ` C${ax - h.r * 0.25} ${h.cy + E * 0.2} ${ax - h.r * 0.2} ${ay + h.r * 0.3} ${ax} ${ay} Z`;
     s += C('path', `d="${ear}"`);
-    s += `<path d="M${ax + h.r * 0.2} ${ay + h.r * 0.5} q${h.r * 0.25} ${E * 0.5} ${h.r * 0.05} ${E * 1.1} M${ax + h.r * 0.5} ${ay + h.r * 0.45} q${h.r * 0.2} ${E * 0.5} ${0} ${E * 1.15}" stroke="${line}" stroke-width=".9" fill="none" stroke-linecap="round" opacity=".85"/>`;
+    if (B.fringe) s += Array.from({ length: B.fringe + 1 }, (_, i) => `<path d="M${ax + h.r * (0.15 + i * 0.22)} ${ay + h.r * 0.5} q${h.r * 0.22} ${E * 0.5} ${h.r * 0.04} ${E * 1.12}" stroke="${line}" stroke-width=".9" fill="none" stroke-linecap="round" opacity=".85"/>`).join('');
   }
   if (o.front) s += o.front;
-  // 光環
   if (B.halo) s += `<ellipse cx="${h.cx + 1}" cy="${h.cy - h.r - 5}" rx="${h.r * 0.75}" ry="${h.r * 0.22}" fill="none" stroke="#ffd54a" stroke-width="2"/><ellipse cx="${h.cx + 1}" cy="${h.cy - h.r - 5}" rx="${h.r * 0.75}" ry="${h.r * 0.22}" fill="none" stroke="#fff6c2" stroke-width=".6"/>`;
+  if (B.aura) for (const [x, y, r] of [[12, 20, 2.6], [88, 30, 2], [80, 8, 1.6], [6, 60, 1.8], [94, 70, 2.4]])
+    s += `<path d="M${x} ${y - r * 2} L${x + r * 0.5} ${y - r * 0.5} L${x + r * 2} ${y} L${x + r * 0.5} ${y + r * 0.5} L${x} ${y + r * 2} L${x - r * 0.5} ${y + r * 0.5} L${x - r * 2} ${y} L${x - r * 0.5} ${y - r * 0.5} Z" fill="#fff3a6"/>`;
+  if (B.pose === 'run') s += `<path d="M${b.cx + b.rx + 6} ${b.cy - 4} h8 M${b.cx + b.rx + 8} ${b.cy + 2} h10 M${b.cx + b.rx + 5} ${b.cy + 8} h7" stroke="#9aa7b5" stroke-width="1.4" stroke-linecap="round" opacity=".7"/>`;
   // 帽子、嘴裡叼的東西（表情圖案）
   const hat = hatId && PET_ITEM[hatId], gear = gearId && PET_ITEM[gearId];
   if (hat) s += `<text x="${h.cx + h.r * 0.05}" y="${h.cy - h.r * 0.45}" font-size="${h.r * 1.75}" text-anchor="middle">${hat.emoji}</text>`;
