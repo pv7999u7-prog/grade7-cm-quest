@@ -983,7 +983,8 @@ const groupRange = g => groupChapters(g).filter(c => S.range.includes(c.key));
 function rangeSummary() {
   return Object.entries(GROUPS).map(([g, info]) => {
     const r = groupRange(g);
-    const names = r.length > 4 ? `${r.slice(0, 4).map(c => c.label).join('、')}…共 ${r.length} 個` : r.map(c => c.label).join('、') || '（還沒選）';
+    const lab = c => (info.subjects.length > 1 ? SUBJ[c.s].name : '') + c.label; // 社會有地理、歷史、公民，要標出科目
+    const names = r.length > 4 ? `${r.slice(0, 4).map(lab).join('、')}…共 ${r.length} 個` : r.map(lab).join('、') || '（還沒選）';
     return `${info.icon} <b>${info.name}</b>：${esc(names)}`;
   }).join('<br>');
 }
@@ -997,7 +998,7 @@ function rangePage(daily) {
         <div class="row between wrap"><h3>${info.icon} ${info.name}</h3><span class="small muted">已選 ${groupRange(g).length} / ${groupChapters(g).length}</span></div>
         <div class="btn-row" style="margin:8px 0">${EXAMS.map((name, n) => n ? `<button class="btn-sm" onclick="setGroupExam('${g}', ${n}, ${daily})">${name}</button>` : '').join('')}
           <button class="btn-sm" onclick="setGroupExam('${g}', 0, ${daily})">全部</button></div>
-        ${groupChapters(g).map(c => `
+        ${groupChapters(g).map((c, i, a) => `${info.subjects.length > 1 && (i === 0 || a[i - 1].s !== c.s) ? `<div class="range-subj">${SUBJ[c.s].icon} ${SUBJ[c.s].name}</div>` : ''}
           <label class="check-row"><input type="checkbox" ${S.range.includes(c.key) ? 'checked' : ''} onchange="toggleRange('${c.key}', this.checked); rangePage(${daily})">
           ${examTag(c)} ${c.label} ${esc(c.name)}</label>`).join('')}
       </div>`).join('')}
