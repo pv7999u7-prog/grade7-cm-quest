@@ -89,6 +89,7 @@ const PET_SHOP = {
     { id: 'g-violin', emoji: '🎻', name: '小提琴', cost: 250 },
     { id: 'g-trophy', emoji: '🏆', name: '冠軍獎盃', cost: 500 },
     { id: 'g-wand', emoji: '🪄', name: '魔法棒', cost: 1000 },
+    { id: 'g-ak47', emoji: '', name: 'AK47 步槍', cost: 600, svg: '<rect x="0" y="5" width="14" height="1.6" fill="#4a4a4a"/><rect x="1.5" y="3.4" width="1" height="1.8" fill="#4a4a4a"/><rect x="6" y="3.7" width="9" height="1.4" fill="#5a5a5a"/><rect x="12" y="4" width="8.5" height="3.6" rx="1" fill="#a0582a"/><rect x="19.5" y="3.4" width="11" height="4.6" rx=".6" fill="#3a3a3a"/><rect x="22" y="4.6" width="5" height=".8" fill="#666"/><path d="M21.5 8 L25.5 8 Q26.5 12 28.5 15 L24.5 16.2 Q22.5 12 21.5 8 Z" fill="#c4652a"/><path d="M22.5 9 Q23.2 11.5 24.6 14" stroke="#9a4a1c" stroke-width=".5" fill="none"/><path d="M28.5 8 L31.5 8 L32.5 13 L29.5 13.4 Z" fill="#6b3a1e"/><path d="M30.5 4 L40 5 L40 10.6 L31 8 Z" fill="#a0582a"/><path d="M33 6 L39 6.6" stroke="#7a4020" stroke-width=".5"/>' }, // 自己畫的卡通步槍（寬 40、高 16），槍口朝左
   ] },
   mount: { name: '坐騎', icon: '🛹', items: [
     { id: 'm-skate', emoji: '🛹', name: '滑板', cost: 50 },
@@ -399,7 +400,8 @@ function petSvg(stage, colorId, outfitId, gearId, hatId) {
   // 帽子、嘴裡叼的東西（表情圖案）
   const hat = hatId && PET_ITEM[hatId], gear = gearId && PET_ITEM[gearId];
   if (hat) s += `<text x="${h.cx + h.r * 0.05}" y="${h.cy - h.r * 0.45}" font-size="${h.r * 1.75}" text-anchor="middle">${hat.emoji}</text>`;
-  if (gear) s += `<text x="${sx - h.r * 0.15}" y="${sy + h.r * 1.25}" font-size="${h.r * 1.35}" text-anchor="middle" transform="rotate(-10 ${sx} ${sy})">${gear.emoji}</text>`;
+  if (gear && gear.svg) s += `<g transform="translate(${sx - h.r * 2.05} ${sy - h.r * 0.2}) scale(${k * 0.95}) rotate(-6)">${gear.svg}</g>`; // 咬在嘴裡，槍口朝前
+  else if (gear) s += `<text x="${sx - h.r * 0.15}" y="${sy + h.r * 1.25}" font-size="${h.r * 1.35}" text-anchor="middle" transform="rotate(-10 ${sx} ${sy})">${gear.emoji}</text>`;
   return s + '</svg>';
 }
 
@@ -551,6 +553,7 @@ function petShopHtml(slot, free) {
     const preview = slot === 'color' ? `<span class="pi-ico pi-svg">${petSvg(2, it.id)}</span>`
       : slot === 'outfit' ? `<span class="pi-ico pi-svg">${petSvg(Math.max(2, petStage(p)), p.equip.color, it.id)}</span>`
       : slot === 'bg' ? `<span class="pi-ico pi-bg" style="background:${it.bg}">${it.art ? `<svg class="pet-art" viewBox="0 0 100 100" preserveAspectRatio="none">${it.art}</svg>` : ''}${big ? `<span class="pi-bg-deco">${big[0]}</span>` : ''}</span>`
+      : it.svg ? `<span class="pi-ico"><svg viewBox="-2 -2 44 20" style="width:64px;height:30px">${it.svg}</svg></span>`
       : `<span class="pi-ico">${it.emoji}</span>`;
     const label = on ? (slot === 'color' || slot === 'bg' ? '使用中' : '使用中（點一下卸下）') : owned ? '點一下換上' : it.cost ? `🪙 ${it.cost}` : '免費';
     return `<button class="pet-item ${on ? 'on' : ''}" onclick="petShopTap('${slot}','${it.id}')" ${!owned && free < it.cost ? 'disabled' : ''}>
