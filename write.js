@@ -157,6 +157,7 @@ function writeFinish(ok) {
 
 // ───────── 家長頁設定 ─────────
 function writeSettingHtml() {
+  if (!BANK.some(q => q.t === 'write')) return ''; // 沒有手寫題的 App（社會＋自然）不顯示這個設定
   const mode = S.hwMode || 'auto';
   return `
     <div class="card">
